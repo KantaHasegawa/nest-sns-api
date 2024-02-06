@@ -10,4 +10,18 @@ export class User {
 
   @Column()
   password: string;
+
+  UserIgnoreSensitive(): UserIgnoreSensitive {
+    return new UserIgnoreSensitive(this);
+  }
+}
+
+export class UserIgnoreSensitive {
+  id: number;
+  name: string;
+
+  constructor(user: User) {
+    this.id = user.id;
+    this.name = user.name;
+  }
 }

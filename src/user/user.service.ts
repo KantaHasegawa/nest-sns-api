@@ -1,26 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from './user';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { User, UserIgnoreSensitive } from './user';
 import { UserPostDto } from './user.post.dto';
 import * as bcrypt from 'bcrypt';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-  ) {}
+  constructor(private usersRepository: UserRepository) {}
 
-  async create(dto: UserPostDto): Promise<User | Error> {
+  async findAll(): Promise<UserIgnoreSensitive[]> {
+    return await this.usersRepository.findAllIgnoreSensitive();
+  }
+
+  async create(dto: UserPostDto): Promise<UserIgnoreSensitive> {
+    const hash = await bcrypt.hash(dto.password, 10);
+    const user = new User();
+    user.name = dto.name;
+    user.password = hash;
     try {
-      const hash = await bcrypt.hash(dto.password, 10);
-      const user = new User();
-      user.name = dto.name;
-      user.password = hash;
+      const result = await this.usersRepository.save(user);
+      return new UserIgnoreSensitive(result);
     } catch (err) {
-      console.log(err);
-      return Error('Error creating user');
+      if (err.code === 'ER_DUP_ENTRY') {
+        throw new BadRequestException('User already exists');
+      } else {
+        throw err;
+      }
     }
   }
 }
