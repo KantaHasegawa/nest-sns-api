@@ -1,21 +1,24 @@
 version: 2.1
+orbs:
+  node: circleci/node@5.2.0
 
 jobs:
-  build:
+  build_and_test:
     docker:
-      - image: cimg/base:stable # 使用するDockerイメージ
+      - image: cimg/node:20.11.0
     steps:
       - checkout
+      - node/install-packages:
+          pkg-manager: npm
       - run:
-          name: Hello World
-          command: |
-            echo "Hello World"
+          command: npm run test:e2e
+          name: Run tests
 
 workflows:
-  version: 2
-  build_on_develop:
+  test_my_app:
     jobs:
-      - build:
+      - build_and_test:
           filters:
             branches:
-              only: develop
+              only:
+                - develop
