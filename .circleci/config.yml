@@ -6,6 +6,13 @@ jobs:
   build_and_test:
     docker:
       - image: cimg/node:20.11.0
+      - image: cimg/mysql:8.0
+        command: |
+          mysqld --default-authentication-plugin=mysql_native_password
+        environment:
+          MYSQL_DATABASE: sns_test
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_ROOT_PASSWORD: 'password'
     steps:
       - checkout
       - node/install-packages:
