@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({ length: 10, unique: true })
   name: string;
@@ -17,7 +17,7 @@ export class User {
 }
 
 export class UserIgnoreSensitive {
-  id: number;
+  id: string;
   name: string;
 
   constructor(user: User) {

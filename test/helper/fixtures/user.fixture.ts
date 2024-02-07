@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { Chance } from 'chance';
 import { v4 as uuidv4 } from 'uuid';
 import { User, UserIgnoreSensitive } from '../../../src/user/user';
+import * as bcrypt from 'bcrypt';
 
 export class UserFixture {
   dataSource: DataSource;
@@ -21,5 +22,14 @@ export class UserFixture {
       await this.dataSource.getRepository(User).save(u);
       users.push(u.UserIgnoreSensitive());
     }
+  }
+
+  async createByParams(name: string, password: string) {
+    const u = new User();
+    u.id = uuidv4();
+    u.name = name;
+    u.password = await bcrypt.hash(password, 10);
+    await this.dataSource.getRepository(User).save(u);
+    return u.UserIgnoreSensitive();
   }
 }

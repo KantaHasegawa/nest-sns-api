@@ -13,6 +13,9 @@ describe('Users', () => {
   let app: INestApplication;
   let userFixture: UserFixture;
   let userRepository: UserRepository;
+  const mockRedisClient = {
+    hSet: jest.fn(),
+  };
 
   beforeAll(async () => {
     await testDataSource.initializeTest();
@@ -21,6 +24,8 @@ describe('Users', () => {
     })
       .overrideProvider(DataSource)
       .useValue(testDataSource)
+      .overrideProvider('REDIS')
+      .useValue(mockRedisClient)
       .compile();
 
     const dataSource = moduleRef.get<DataSource>(DataSource);
@@ -56,5 +61,18 @@ describe('Users', () => {
     });
     expect(act.name).toBe(params.name);
     expect(await bcrypt.compare(params.password, act.password)).toBe(true);
+  });
+
+  it(`/POST users/login`, async () => {
+    const params = {
+      name: 'loginuser',
+      password: 'password',
+    };
+    await userFixture.createByParams(params.name, params.password);
+    const res = await request(app.getHttpServer())
+      .post('/users/login')
+      .send(params)
+      .expect(201);
+    expect(res.body.token).toBeDefined();
   });
 });

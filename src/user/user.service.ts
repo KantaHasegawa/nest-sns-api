@@ -1,13 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { User, UserIgnoreSensitive } from './user';
 import { UserPostDto } from './user.post.dto';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
 import { Chance } from 'chance';
+import { RedisClientType } from 'redis';
 
 @Injectable()
 export class UserService {
-  constructor(private usersRepository: UserRepository) {}
+  constructor(
+    @Inject('REDIS') private redisClient: RedisClientType,
+    private usersRepository: UserRepository,
+  ) {}
 
   async findAll(): Promise<UserIgnoreSensitive[]> {
     return await this.usersRepository.findAllIgnoreSensitive();
@@ -42,6 +46,9 @@ export class UserService {
       throw new BadRequestException('Invalid password');
     }
     const token = Chance().guid();
+    const expiredAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
+    await this.redisClient.hSet(user.id, 'token', token);
+    await this.redisClient.hSet(user.id, 'expiredAt', expiredAt.toISOString());
     return token;
   }
 }
