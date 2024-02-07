@@ -3,6 +3,7 @@ import { User, UserIgnoreSensitive } from './user';
 import { UserPostDto } from './user.post.dto';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
+import { Chance } from 'chance';
 
 @Injectable()
 export class UserService {
@@ -27,5 +28,20 @@ export class UserService {
         throw err;
       }
     }
+  }
+
+  async login(dto: UserPostDto): Promise<string> {
+    const user = await this.usersRepository.findOne({
+      where: { name: dto.name },
+    });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    const match = await bcrypt.compare(dto.password, user.password);
+    if (!match) {
+      throw new BadRequestException('Invalid password');
+    }
+    const token = Chance().guid();
+    return token;
   }
 }
