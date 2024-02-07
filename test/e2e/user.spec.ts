@@ -68,7 +68,7 @@ describe('Users', () => {
       name: 'loginuser',
       password: 'password',
     };
-    await userFixture.createByParams(params.name, params.password);
+    await userFixture.createByParams(params.name, params.password, 1);
     const res = await request(app.getHttpServer())
       .post('/users/login')
       .send(params)

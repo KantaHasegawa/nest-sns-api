@@ -5,10 +5,15 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
 import { Chance } from 'chance';
 import { RedisClientType } from 'redis';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from '../role/role';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
   constructor(
+    @InjectRepository(Role)
+    private rolesRepository: Repository<Role>,
     @Inject('REDIS') private redisClient: RedisClientType,
     private usersRepository: UserRepository,
   ) {}
@@ -22,6 +27,9 @@ export class UserService {
     const user = new User();
     user.name = dto.name;
     user.password = hash;
+    user.role = await this.rolesRepository.findOne({
+      where: { roleNumber: 1 },
+    });
     try {
       const result = await this.usersRepository.save(user);
       return new UserIgnoreSensitive(result);
