@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { User } from './user/user';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Role } from './role/role';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: config.get<string>('MYSQL_USERNAME'),
         password: config.get<string>('MYSQL_PASSWORD'),
         database: 'sns',
-        entities: [User],
+        entities: [User, Role],
       }),
     }),
     UserModule,

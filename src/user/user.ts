@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Role } from '../role/role';
 
 @Entity({ name: 'users' })
 export class User {
@@ -10,6 +11,11 @@ export class User {
 
   @Column()
   password: string;
+
+  @ManyToOne(() => Role, (role) => role.users, {
+    createForeignKeyConstraints: false,
+  })
+  role: Role;
 
   UserIgnoreSensitive(): UserIgnoreSensitive {
     return new UserIgnoreSensitive(this);
