@@ -1,5 +1,5 @@
-import { UserRepository } from './../../src/user/user.repository';
-import { UserFixture } from './../helper/fixtures/user.fixture';
+import { UserRepository } from '../../src/user/user.repository';
+import { UserFixture } from '../helper/fixtures/user.fixture';
 import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
@@ -15,7 +15,7 @@ describe('Users', () => {
   let userRepository: UserRepository;
 
   beforeAll(async () => {
-    await testDataSource.initialize();
+    await testDataSource.initializeTest();
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
