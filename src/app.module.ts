@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Role } from './role/role';
 import { Tweet } from './tweet/tweet';
 import { TweetModule } from './tweet/tweet.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TweetModule } from './tweet/tweet.module';
     }),
     UserModule,
     TweetModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

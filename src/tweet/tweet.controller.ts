@@ -1,10 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { TweetService } from './tweet.service';
+import { AuthBearerGuard } from '../auth/auth.bearer.guard';
 
 @Controller('tweets')
 export class TweetController {
   constructor(private tweetService: TweetService) {}
 
+  @UseGuards(AuthBearerGuard)
   @Get('')
   async index() {
     return this.tweetService.findAll();
