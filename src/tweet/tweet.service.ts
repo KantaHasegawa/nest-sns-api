@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { TweetPostDto } from './tweet.post.dto';
+import { UserIgnoreSensitive } from '../user/user';
 
 @Injectable()
 export class TweetService {
@@ -14,8 +15,14 @@ export class TweetService {
     return this.tweetRepository.find();
   }
 
-  async create(dto: TweetPostDto): Promise<Tweet> {
-    return this.tweetRepository.save(dto);
+  async create(
+    current: UserIgnoreSensitive,
+    dto: TweetPostDto,
+  ): Promise<Tweet> {
+    const tweet = new Tweet();
+    tweet.content = dto.content;
+    tweet.user = current;
+    return this.tweetRepository.save(tweet);
   }
 
   async delete(id: string) {

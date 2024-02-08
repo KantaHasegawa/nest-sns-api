@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { User } from '../user/user';
+import { User, UserIgnoreSensitive } from '../user/user';
 
 @Entity('tweets')
 export class Tweet {
@@ -10,5 +10,5 @@ export class Tweet {
   content: string;
 
   @ManyToOne(() => User, (user) => user.tweets)
-  user: User;
+  user: UserIgnoreSensitive;
 }

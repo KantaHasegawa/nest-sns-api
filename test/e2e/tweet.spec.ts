@@ -8,6 +8,8 @@ import { UserFixture } from '../helper/fixtures/user.fixture';
 import { Chance } from 'chance';
 import * as request from 'supertest';
 import { AuthBearerStrategy } from '../../src/auth/auth.bearer.strategy';
+import { Tweet } from '../../src/tweet/tweet';
+import { User } from '../../src/user/user';
 
 describe('Tweet', () => {
   const chance = new Chance();
@@ -15,6 +17,7 @@ describe('Tweet', () => {
   let app: INestApplication;
   let tweetFixture: TweetFixture;
   let userFixture: UserFixture;
+  let current: User;
   const mockRedisClient = {
     hSet: jest.fn(),
   };
@@ -23,7 +26,7 @@ describe('Tweet', () => {
     await testDataSource.initializeTest();
     tweetFixture = new TweetFixture(testDataSource);
     userFixture = new UserFixture(testDataSource);
-    const [current] = await userFixture.create(1);
+    const current = await userFixture.create();
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -45,12 +48,26 @@ describe('Tweet', () => {
   });
 
   it(`/GET tweets`, async () => {
-    const [user] = await userFixture.create(1);
-    await tweetFixture.createByParams(user, chance.sentence());
+    await tweetFixture.createByParams(current, chance.sentence());
     const res = await request(app.getHttpServer())
       .get('/tweets')
       .set('Authorization', 'Bearer token')
       .expect(200);
     expect(res.body.length).toBe(1);
+  });
+
+  it(`/POST tweets`, async () => {
+    const params = {
+      content: chance.sentence(),
+    };
+    await request(app.getHttpServer())
+      .post('/tweets')
+      .send(params)
+      .set('Authorization', 'Bearer token')
+      .expect(201);
+    const act = await testDataSource.getRepository<Tweet>(Tweet).findOne({
+      where: { user: current, content: params.content },
+    });
+    expect(act.content).toBe(params.content);
   });
 });

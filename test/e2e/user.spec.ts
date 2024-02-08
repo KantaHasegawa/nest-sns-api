@@ -42,7 +42,7 @@ describe('Users', () => {
   });
 
   it(`/GET users`, async () => {
-    await userFixture.create(10);
+    await userFixture.createMany(10);
     const res = await request(app.getHttpServer()).get('/users').expect(200);
     expect(res.body.length).toBe(10);
   });
