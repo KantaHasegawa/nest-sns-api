@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { Role } from '../role/role';
+import { Tweet } from '../tweet/tweet';
 
 @Entity({ name: 'users' })
 export class User {
@@ -16,6 +23,9 @@ export class User {
     createForeignKeyConstraints: false,
   })
   role: Role;
+
+  @OneToMany(() => Tweet, (post) => post.user)
+  tweets: Tweet[];
 
   UserIgnoreSensitive(): UserIgnoreSensitive {
     return new UserIgnoreSensitive(this);
