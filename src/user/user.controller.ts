@@ -1,12 +1,14 @@
 import { UserLoginView } from './user.login.view';
 import { UserPostDto } from './user.post.dto';
 import { UserService } from './user.service';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { AuthBearerGuard } from '../auth/auth.bearer.guard';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @UseGuards(AuthBearerGuard)
   @Get('')
   async findAll() {
     return await this.userService.findAll();
