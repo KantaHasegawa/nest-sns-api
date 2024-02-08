@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Role } from '../role/role';
 
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({ length: 10, unique: true })
   name: string;
@@ -11,13 +12,18 @@ export class User {
   @Column()
   password: string;
 
+  @ManyToOne(() => Role, (role) => role.users, {
+    createForeignKeyConstraints: false,
+  })
+  role: Role;
+
   UserIgnoreSensitive(): UserIgnoreSensitive {
     return new UserIgnoreSensitive(this);
   }
 }
 
 export class UserIgnoreSensitive {
-  id: number;
+  id: string;
   name: string;
 
   constructor(user: User) {
