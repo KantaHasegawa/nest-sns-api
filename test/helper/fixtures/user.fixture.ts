@@ -21,7 +21,7 @@ export class UserFixture {
     for (let i = 0; i < count; i++) {
       const u = new User();
       u.id = uuidv4();
-      u.name = this.chance.word({ length: 10 });
+      u.name = this.chance.name();
       u.password = await bcrypt.hash(this.chance.word({ length: 10 }), 10);
       u.role = basicRole;
       await this.dataSource.getRepository(User).save(u);

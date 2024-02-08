@@ -15,6 +15,6 @@ import { UserRepository } from '../user/user.repository';
     RedisProvider,
     UserRepository,
   ],
-  exports: [AuthBearerGuard],
+  exports: [AuthBearerGuard, AuthBearerStrategy],
 })
 export class AuthModule {}
