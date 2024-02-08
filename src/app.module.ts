@@ -7,6 +7,7 @@ import { User } from './user/user';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Role } from './role/role';
 import { Tweet } from './tweet/tweet';
+import { TweetModule } from './tweet/tweet.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Tweet } from './tweet/tweet';
       }),
     }),
     UserModule,
+    TweetModule,
   ],
   controllers: [AppController],
   providers: [AppService],
