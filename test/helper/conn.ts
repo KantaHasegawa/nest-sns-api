@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { User } from '../../src/user/user';
 import { patchRole } from '../../src/database/patch/role';
 import { Role } from '../../src/role/role';
+import { Tweet } from '../../src/tweet/tweet';
 
 class TestDataSource extends DataSource {
   constructor() {
@@ -13,7 +14,7 @@ class TestDataSource extends DataSource {
       username: 'root',
       password: 'password',
       database: 'sns_test',
-      entities: [User, Role],
+      entities: [User, Role, Tweet],
       synchronize: true,
     });
   }

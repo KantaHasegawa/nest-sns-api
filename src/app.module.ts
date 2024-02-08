@@ -6,6 +6,9 @@ import { UserModule } from './user/user.module';
 import { User } from './user/user';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Role } from './role/role';
+import { Tweet } from './tweet/tweet';
+import { TweetModule } from './tweet/tweet.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,10 +24,12 @@ import { Role } from './role/role';
         username: config.get<string>('MYSQL_USERNAME'),
         password: config.get<string>('MYSQL_PASSWORD'),
         database: 'sns',
-        entities: [User, Role],
+        entities: [User, Role, Tweet],
       }),
     }),
     UserModule,
+    TweetModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

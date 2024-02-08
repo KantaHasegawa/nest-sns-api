@@ -55,8 +55,8 @@ export class UserService {
     }
     const token = Chance().guid();
     const expiredAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
-    await this.redisClient.hSet(user.id, 'token', token);
-    await this.redisClient.hSet(user.id, 'expiredAt', expiredAt.toISOString());
+    await this.redisClient.hSet(token, 'user', user.id);
+    await this.redisClient.hSet(token, 'expiredAt', expiredAt.toISOString());
     return token;
   }
 }

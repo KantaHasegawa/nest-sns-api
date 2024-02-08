@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { Chance } from 'chance';
 import { v4 as uuidv4 } from 'uuid';
-import { User, UserIgnoreSensitive } from '../../../src/user/user';
+import { User } from '../../../src/user/user';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../../../src/role/role';
 
@@ -14,19 +14,20 @@ export class UserFixture {
   }
 
   async create(count: number) {
-    const users: UserIgnoreSensitive[] = [];
+    const users: User[] = [];
     const basicRole = await this.dataSource
       .getRepository<Role>(Role)
       .findOne({ where: { roleNumber: 1 } });
     for (let i = 0; i < count; i++) {
       const u = new User();
       u.id = uuidv4();
-      u.name = this.chance.word({ length: 10 });
+      u.name = this.chance.name();
       u.password = await bcrypt.hash(this.chance.word({ length: 10 }), 10);
       u.role = basicRole;
       await this.dataSource.getRepository(User).save(u);
-      users.push(u.UserIgnoreSensitive());
+      users.push(u);
     }
+    return users;
   }
 
   async createByParams(name: string, password: string, roleNumber: number) {
