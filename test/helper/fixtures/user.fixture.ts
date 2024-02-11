@@ -13,14 +13,13 @@ export class UserFixture {
     this.chance = new Chance.Chance();
   }
 
-  async create(count: number) {
+  async createMany(count: number) {
     const users: User[] = [];
     const basicRole = await this.dataSource
       .getRepository<Role>(Role)
       .findOne({ where: { roleNumber: 1 } });
     for (let i = 0; i < count; i++) {
       const u = new User();
-      u.id = uuidv4();
       u.name = this.chance.name();
       u.password = await bcrypt.hash(this.chance.word({ length: 10 }), 10);
       u.role = basicRole;
@@ -28,6 +27,17 @@ export class UserFixture {
       users.push(u);
     }
     return users;
+  }
+
+  async create() {
+    const basicRole = await this.dataSource
+      .getRepository<Role>(Role)
+      .findOne({ where: { roleNumber: 1 } });
+    const u = new User();
+    u.name = this.chance.name();
+    u.password = await bcrypt.hash(this.chance.word({ length: 10 }), 10);
+    u.role = basicRole;
+    return await this.dataSource.getRepository(User).save(u);
   }
 
   async createByParams(name: string, password: string, roleNumber: number) {

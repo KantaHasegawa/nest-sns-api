@@ -42,6 +42,35 @@ export class UserService {
     }
   }
 
+  async follow(id: string, followId: string) {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['follow'],
+    });
+    const follow = await this.usersRepository.findOne({
+      where: { id: followId },
+    });
+    user.follow.push(follow);
+    await this.usersRepository.save(user);
+    return;
+  }
+
+  async findFllows(id: string) {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['follow'],
+    });
+    return user.follow.map((u) => new UserIgnoreSensitive(u));
+  }
+
+  async findFllowers(id: string) {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['follower'],
+    });
+    return user.follower.map((u) => new UserIgnoreSensitive(u));
+  }
+
   async login(dto: UserPostDto): Promise<string> {
     const user = await this.usersRepository.findOne({
       where: { name: dto.name },

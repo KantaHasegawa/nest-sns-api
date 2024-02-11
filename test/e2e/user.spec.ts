@@ -7,6 +7,8 @@ import { DataSource } from 'typeorm';
 import { AppModule } from '../../src/app.module';
 import { testDataSourceInstance } from '../helper/conn';
 import * as bcrypt from 'bcrypt';
+import { AuthBearerStrategy } from '../../src/auth/auth.bearer.strategy';
+import { User } from '../../src/user/user';
 
 describe('Users', () => {
   const testDataSource = testDataSourceInstance;
@@ -16,9 +18,12 @@ describe('Users', () => {
   const mockRedisClient = {
     hSet: jest.fn(),
   };
+  let current: User;
 
   beforeAll(async () => {
     await testDataSource.initializeTest();
+    userFixture = new UserFixture(testDataSource);
+    current = await userFixture.create();
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -33,6 +38,8 @@ describe('Users', () => {
     userRepository = moduleRef.get<UserRepository>(UserRepository);
 
     app = moduleRef.createNestApplication();
+    const mockAuthBearerStrategy = moduleRef.get(AuthBearerStrategy);
+    jest.spyOn(mockAuthBearerStrategy, 'validate').mockResolvedValue(current);
     await app.init();
   });
 
@@ -42,9 +49,12 @@ describe('Users', () => {
   });
 
   it(`/GET users`, async () => {
-    await userFixture.create(10);
-    const res = await request(app.getHttpServer()).get('/users').expect(200);
-    expect(res.body.length).toBe(10);
+    await userFixture.createMany(10);
+    const res = await request(app.getHttpServer())
+      .get('/users')
+      .set('Authorization', 'Bearer token')
+      .expect(200);
+    expect(res.body.length).toBe(11);
   });
 
   it(`/POST users`, async () => {
@@ -61,6 +71,26 @@ describe('Users', () => {
     });
     expect(act.name).toBe(params.name);
     expect(await bcrypt.compare(params.password, act.password)).toBe(true);
+  });
+
+  it('user follow follower', async () => {
+    const followdUser = await userFixture.create();
+    const params = {
+      follow_id: followdUser.id,
+    };
+
+    await request(app.getHttpServer())
+      .post('/users/follow')
+      .send(params)
+      .set('Authorization', 'Bearer token')
+      .expect(201);
+
+    const res = await request(app.getHttpServer())
+      .get('/users/follows')
+      .set('Authorization', 'Bearer token')
+      .expect(200);
+    const act = followdUser.UserIgnoreSensitive();
+    expect(res.body[0]).toEqual(act);
   });
 
   it(`/POST users/login`, async () => {
