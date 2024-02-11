@@ -8,6 +8,7 @@ import { AppModule } from '../../src/app.module';
 import { testDataSourceInstance } from '../helper/conn';
 import * as bcrypt from 'bcrypt';
 import { AuthBearerStrategy } from '../../src/auth/auth.bearer.strategy';
+import { User } from '../../src/user/user';
 
 describe('Users', () => {
   const testDataSource = testDataSourceInstance;
@@ -17,11 +18,12 @@ describe('Users', () => {
   const mockRedisClient = {
     hSet: jest.fn(),
   };
+  let current: User;
 
   beforeAll(async () => {
     await testDataSource.initializeTest();
     userFixture = new UserFixture(testDataSource);
-    const current = await userFixture.create();
+    current = await userFixture.create();
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -69,6 +71,26 @@ describe('Users', () => {
     });
     expect(act.name).toBe(params.name);
     expect(await bcrypt.compare(params.password, act.password)).toBe(true);
+  });
+
+  it('user follow follower', async () => {
+    const followdUser = await userFixture.create();
+    const params = {
+      follow_id: followdUser.id,
+    };
+
+    await request(app.getHttpServer())
+      .post('/users/follow')
+      .send(params)
+      .set('Authorization', 'Bearer token')
+      .expect(201);
+
+    const res = await request(app.getHttpServer())
+      .get('/users/follows')
+      .set('Authorization', 'Bearer token')
+      .expect(200);
+    const act = followdUser.UserIgnoreSensitive();
+    expect(res.body[0]).toEqual(act);
   });
 
   it(`/POST users/login`, async () => {

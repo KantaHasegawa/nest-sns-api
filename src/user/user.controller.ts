@@ -5,7 +5,6 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Post,
   UseGuards,
   Request,
@@ -23,14 +22,18 @@ export class UserController {
     return await this.userService.findAll();
   }
 
-  @Get('follows/:id')
-  async findFllowings(@Param('id') id: string) {
-    return await this.userService.findFllows(id);
+  @UseGuards(AuthBearerGuard)
+  @Get('follows')
+  async findFllowings(@Request() req) {
+    const current = req.user as User;
+    return await this.userService.findFllows(current.id);
   }
 
-  @Get('followers/:id')
-  async findFllowers(@Param('id') id: string) {
-    return await this.userService.findFllowers(id);
+  @UseGuards(AuthBearerGuard)
+  @Get('followers')
+  async findFllowers(@Request() req) {
+    const current = req.user as User;
+    return await this.userService.findFllowers(current.id);
   }
 
   @Post('')

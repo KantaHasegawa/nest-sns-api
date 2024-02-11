@@ -51,7 +51,7 @@ export class UserService {
       where: { id: followId },
     });
     user.follow.push(follow);
-    this.usersRepository.save(user);
+    await this.usersRepository.save(user);
     return;
   }
 
