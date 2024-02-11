@@ -12,6 +12,7 @@ import { TweetService } from './tweet.service';
 import { AuthBearerGuard } from '../auth/auth.bearer.guard';
 import { TweetPostDto } from './tweet.post.dto';
 import { User } from '../user/user';
+import { AuthRolePremiumGuard } from '../auth/auth.role.premium.guard';
 
 @UseGuards(AuthBearerGuard)
 @Controller('tweets')
@@ -23,6 +24,7 @@ export class TweetController {
     return this.tweetService.findAll();
   }
 
+  @UseGuards(AuthRolePremiumGuard)
   @Get('likes')
   async likes(@Request() req) {
     const current = req.user as User;
