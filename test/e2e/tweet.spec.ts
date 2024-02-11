@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { testDataSourceInstance } from '../helper/conn';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { DataSource } from 'typeorm';
 import { TweetFixture } from '../helper/fixtures/tweet.fixture';
@@ -14,20 +14,21 @@ import { User } from '../../src/user/user';
 describe('Tweet', () => {
   const chance = new Chance();
   const testDataSource = testDataSourceInstance;
+  let moduleRef: TestingModule;
   let app: INestApplication;
   let tweetFixture: TweetFixture;
   let userFixture: UserFixture;
   let current: User;
-  const mockRedisClient = {
-    hSet: jest.fn(),
-  };
+  let currentPremium: User;
+  const mockRedisClient = {};
 
   beforeAll(async () => {
     await testDataSource.initializeTest();
     tweetFixture = new TweetFixture(testDataSource);
     userFixture = new UserFixture(testDataSource);
-    const current = await userFixture.create();
-    const moduleRef = await Test.createTestingModule({
+    current = await userFixture.create();
+    currentPremium = await userFixture.createPremium();
+    moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     })
       .overrideProvider(DataSource)
@@ -72,6 +73,10 @@ describe('Tweet', () => {
   });
 
   it('likes', async () => {
+    const mockAuthBearerStrategy = moduleRef.get(AuthBearerStrategy);
+    jest
+      .spyOn(mockAuthBearerStrategy, 'validate')
+      .mockResolvedValue(currentPremium);
     const user = await userFixture.create();
     const tweet = await tweetFixture.createByParams(user, chance.sentence());
     tweet.user = undefined;

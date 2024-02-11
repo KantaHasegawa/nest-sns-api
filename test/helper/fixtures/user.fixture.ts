@@ -40,6 +40,17 @@ export class UserFixture {
     return await this.dataSource.getRepository(User).save(u);
   }
 
+  async createPremium() {
+    const basicRole = await this.dataSource
+      .getRepository<Role>(Role)
+      .findOne({ where: { roleNumber: 2 } });
+    const u = new User();
+    u.name = this.chance.name();
+    u.password = await bcrypt.hash(this.chance.word({ length: 10 }), 10);
+    u.role = basicRole;
+    return await this.dataSource.getRepository(User).save(u);
+  }
+
   async createByParams(name: string, password: string, roleNumber: number) {
     const u = new User();
     u.id = uuidv4();
