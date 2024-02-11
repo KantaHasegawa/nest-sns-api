@@ -16,6 +16,12 @@ export class Tweet {
   @Column()
   content: string;
 
+  @Column({
+    name: 'image_url',
+    nullable: true,
+  })
+  imageUrl: string;
+
   @ManyToOne(() => User, (user) => user.tweets, {
     createForeignKeyConstraints: false,
   })
