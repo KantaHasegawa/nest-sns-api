@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Request,
@@ -13,11 +14,15 @@ import { AuthBearerGuard } from '../auth/auth.bearer.guard';
 import { TweetPostDto } from './tweet.post.dto';
 import { User } from '../user/user';
 import { AuthRolePremiumGuard } from '../auth/auth.role.premium.guard';
+import { S3 } from '@aws-sdk/client-s3';
 
 @UseGuards(AuthBearerGuard)
 @Controller('tweets')
 export class TweetController {
-  constructor(private tweetService: TweetService) {}
+  constructor(
+    @Inject('S3') private s3Client: S3,
+    private tweetService: TweetService,
+  ) {}
 
   @Get('')
   async index() {
