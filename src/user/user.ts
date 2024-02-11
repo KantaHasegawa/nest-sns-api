@@ -45,6 +45,14 @@ export class User {
   })
   follower: User[];
 
+  @ManyToMany(() => Tweet, (tweet) => tweet.likedUsers)
+  @JoinTable({
+    name: 'likes',
+    joinColumn: { name: 'user_id' },
+    inverseJoinColumn: { name: 'tweet_id' },
+  })
+  likedTweets: Tweet[];
+
   UserIgnoreSensitive(): UserIgnoreSensitive {
     return new UserIgnoreSensitive(this);
   }
