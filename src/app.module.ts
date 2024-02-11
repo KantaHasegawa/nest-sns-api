@@ -25,6 +25,7 @@ import { AuthModule } from './auth/auth.module';
         password: config.get<string>('MYSQL_PASSWORD'),
         database: 'sns',
         entities: [User, Role, Tweet],
+        logging: true,
       }),
     }),
     UserModule,

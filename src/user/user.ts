@@ -4,6 +4,8 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Role } from '../role/role';
 import { Tweet } from '../tweet/tweet';
@@ -26,6 +28,22 @@ export class User {
 
   @OneToMany(() => Tweet, (post) => post.user)
   tweets: Tweet[];
+
+  @ManyToMany(() => User, (user) => user.follow)
+  @JoinTable({
+    name: 'relations',
+    joinColumn: { name: 'follow_id' },
+    inverseJoinColumn: { name: 'follower_id' },
+  })
+  follow: User[];
+
+  @ManyToMany(() => User, (user) => user.follower)
+  @JoinTable({
+    name: 'relations',
+    joinColumn: { name: 'follower_id' },
+    inverseJoinColumn: { name: 'follow_id' },
+  })
+  follower: User[];
 
   UserIgnoreSensitive(): UserIgnoreSensitive {
     return new UserIgnoreSensitive(this);
