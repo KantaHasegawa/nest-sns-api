@@ -70,4 +70,22 @@ describe('Tweet', () => {
     });
     expect(act.content).toBe(params.content);
   });
+
+  it('likes', async () => {
+    const user = await userFixture.create();
+    const tweet = await tweetFixture.createByParams(user, chance.sentence());
+    tweet.user = undefined;
+    await request(app.getHttpServer())
+      .post(`/tweets/${tweet.id}/likes`)
+      .set('Authorization', 'Bearer token')
+      .expect(201);
+    const res = await request(app.getHttpServer())
+      .get('/tweets/likes')
+      .set('Authorization', 'Bearer token')
+      .expect(200);
+    const resTweet = new Tweet();
+    resTweet.id = res.body[0].id;
+    resTweet.content = res.body[0].content;
+    expect(resTweet).toEqual(tweet);
+  });
 });

@@ -1,7 +1,7 @@
 import { Tweet } from './tweet';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { TweetPostDto } from './tweet.post.dto';
 import { User } from '../user/user';
 
@@ -11,8 +11,16 @@ export class TweetService {
     @InjectRepository(Tweet) private tweetRepository: Repository<Tweet>,
   ) {}
 
-  async findAll(): Promise<Tweet[]> {
-    return this.tweetRepository.find();
+  async findAll(options?: FindManyOptions<Tweet>): Promise<Tweet[]> {
+    return await this.tweetRepository.find(options);
+  }
+
+  async likes(current: User) {
+    return await this.tweetRepository
+      .createQueryBuilder('tweet')
+      .innerJoin('tweet.likedUsers', 'users')
+      .where('users.id = :id', { id: current.id })
+      .getMany();
   }
 
   async create(current: User, dto: TweetPostDto): Promise<Tweet> {
@@ -20,6 +28,14 @@ export class TweetService {
     tweet.content = dto.content;
     tweet.user = current;
     return this.tweetRepository.save(tweet);
+  }
+
+  async like(current: User, id: string) {
+    this.tweetRepository
+      .createQueryBuilder()
+      .relation(User, 'likedTweets')
+      .of({ id: current.id })
+      .add(id);
   }
 
   async delete(id: string) {
