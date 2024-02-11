@@ -6,7 +6,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { User, UserIgnoreSensitive } from '../user/user';
+import { User } from '../user/user';
 
 @Entity('tweets')
 export class Tweet {
@@ -17,7 +17,7 @@ export class Tweet {
   content: string;
 
   @ManyToOne(() => User, (user) => user.tweets)
-  user: UserIgnoreSensitive;
+  user: User;
 
   @ManyToMany(() => User, (user) => user.likedTweets)
   @JoinTable({

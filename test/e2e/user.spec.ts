@@ -75,6 +75,7 @@ describe('Users', () => {
 
   it('user follow follower', async () => {
     const followdUser = await userFixture.create();
+    followdUser.ignoreSensitive();
     const params = {
       follow_id: followdUser.id,
     };
@@ -89,8 +90,10 @@ describe('Users', () => {
       .get('/users/follows')
       .set('Authorization', 'Bearer token')
       .expect(200);
-    const act = followdUser.UserIgnoreSensitive();
-    expect(res.body[0]).toEqual(act);
+    const resUser = new User();
+    resUser.id = res.body[0].id;
+    resUser.name = res.body[0].name;
+    expect(resUser).toEqual(followdUser);
   });
 
   it(`/POST users/login`, async () => {

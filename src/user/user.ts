@@ -53,17 +53,8 @@ export class User {
   })
   likedTweets: Tweet[];
 
-  UserIgnoreSensitive(): UserIgnoreSensitive {
-    return new UserIgnoreSensitive(this);
-  }
-}
-
-export class UserIgnoreSensitive {
-  id: string;
-  name: string;
-
-  constructor(user: User) {
-    this.id = user.id;
-    this.name = user.name;
+  ignoreSensitive() {
+    this.password = undefined;
+    this.role = undefined;
   }
 }

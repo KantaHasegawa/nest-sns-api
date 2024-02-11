@@ -11,7 +11,7 @@ import {
 import { TweetService } from './tweet.service';
 import { AuthBearerGuard } from '../auth/auth.bearer.guard';
 import { TweetPostDto } from './tweet.post.dto';
-import { UserIgnoreSensitive } from '../user/user';
+import { User } from '../user/user';
 @UseGuards(AuthBearerGuard)
 @Controller('tweets')
 export class TweetController {
@@ -24,7 +24,7 @@ export class TweetController {
 
   @Post('')
   async create(@Request() req, @Body() dto: TweetPostDto) {
-    const current = req.user as UserIgnoreSensitive;
+    const current = req.user as User;
     return this.tweetService.create(current, dto);
   }
 

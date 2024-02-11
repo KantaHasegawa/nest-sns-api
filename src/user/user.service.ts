@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { User, UserIgnoreSensitive } from './user';
+import { User } from './user';
 import { UserPostDto } from './user.post.dto';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from './user.repository';
@@ -18,11 +18,11 @@ export class UserService {
     private usersRepository: UserRepository,
   ) {}
 
-  async findAll(): Promise<UserIgnoreSensitive[]> {
+  async findAll(): Promise<User[]> {
     return await this.usersRepository.findAllIgnoreSensitive();
   }
 
-  async create(dto: UserPostDto): Promise<UserIgnoreSensitive> {
+  async create(dto: UserPostDto): Promise<User> {
     const hash = await bcrypt.hash(dto.password, 10);
     const user = new User();
     user.name = dto.name;
@@ -31,8 +31,7 @@ export class UserService {
       where: { roleNumber: 1 },
     });
     try {
-      const result = await this.usersRepository.save(user);
-      return new UserIgnoreSensitive(result);
+      return await this.usersRepository.save(user);
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') {
         throw new BadRequestException('User already exists');
@@ -60,7 +59,7 @@ export class UserService {
       where: { id },
       relations: ['follow'],
     });
-    return user.follow.map((u) => new UserIgnoreSensitive(u));
+    return user.follow;
   }
 
   async findFllowers(id: string) {
@@ -68,7 +67,7 @@ export class UserService {
       where: { id },
       relations: ['follower'],
     });
-    return user.follower.map((u) => new UserIgnoreSensitive(u));
+    return user.follower;
   }
 
   async login(dto: UserPostDto): Promise<string> {

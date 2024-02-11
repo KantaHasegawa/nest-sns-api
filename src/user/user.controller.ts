@@ -53,5 +53,6 @@ export class UserController {
   async follow(@Request() req, @Body('follow_id') followId: string) {
     const current = req.user as User;
     await this.userService.follow(current.id, followId);
+    return;
   }
 }

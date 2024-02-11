@@ -23,6 +23,6 @@ export class AuthService {
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
-    return user.UserIgnoreSensitive();
+    return user;
   }
 }

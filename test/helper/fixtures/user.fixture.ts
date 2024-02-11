@@ -48,7 +48,6 @@ export class UserFixture {
     u.role = await this.dataSource
       .getRepository(Role)
       .findOne({ where: { roleNumber: roleNumber } });
-    await this.dataSource.getRepository(User).save(u);
-    return u.UserIgnoreSensitive();
+    return await this.dataSource.getRepository(User).save(u);
   }
 }
