@@ -16,10 +16,14 @@ export class Tweet {
   @Column()
   content: string;
 
-  @ManyToOne(() => User, (user) => user.tweets)
+  @ManyToOne(() => User, (user) => user.tweets, {
+    createForeignKeyConstraints: false,
+  })
   user: User;
 
-  @ManyToMany(() => User, (user) => user.likedTweets)
+  @ManyToMany(() => User, (user) => user.likedTweets, {
+    createForeignKeyConstraints: false,
+  })
   @JoinTable({
     name: 'likes',
     joinColumn: { name: 'tweet_id' },

@@ -26,10 +26,14 @@ export class User {
   })
   role: Role;
 
-  @OneToMany(() => Tweet, (post) => post.user)
+  @OneToMany(() => Tweet, (post) => post.user, {
+    createForeignKeyConstraints: false,
+  })
   tweets: Tweet[];
 
-  @ManyToMany(() => User, (user) => user.follow)
+  @ManyToMany(() => User, (user) => user.follow, {
+    createForeignKeyConstraints: false,
+  })
   @JoinTable({
     name: 'relations',
     joinColumn: { name: 'follow_id' },
@@ -37,7 +41,9 @@ export class User {
   })
   follow: User[];
 
-  @ManyToMany(() => User, (user) => user.follower)
+  @ManyToMany(() => User, (user) => user.follower, {
+    createForeignKeyConstraints: false,
+  })
   @JoinTable({
     name: 'relations',
     joinColumn: { name: 'follower_id' },
@@ -45,7 +51,9 @@ export class User {
   })
   follower: User[];
 
-  @ManyToMany(() => Tweet, (tweet) => tweet.likedUsers)
+  @ManyToMany(() => Tweet, (tweet) => tweet.likedUsers, {
+    createForeignKeyConstraints: false,
+  })
   @JoinTable({
     name: 'likes',
     joinColumn: { name: 'user_id' },
