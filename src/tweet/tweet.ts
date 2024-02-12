@@ -17,10 +17,13 @@ export class Tweet {
   content: string;
 
   @Column({
-    name: 'image_url',
+    name: 'image_key',
     nullable: true,
   })
-  imageUrl: string;
+  imageKey: string;
+
+  // NOTE: not column;
+  imageURL?: string;
 
   @ManyToOne(() => User, (user) => user.tweets, {
     createForeignKeyConstraints: false,
