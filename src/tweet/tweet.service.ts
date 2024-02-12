@@ -4,16 +4,15 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FindManyOptions, Repository } from 'typeorm';
 import { TweetPostDto } from './tweet.post.dto';
 import { User } from '../user/user';
-import { GetObjectCommand, S3 } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { S3CustomClient } from '../s3/s3.provider';
 
 @Injectable()
 export class TweetService {
   constructor(
     @InjectQueue('tweet') private tweetQueue: Queue,
-    @Inject('S3') private s3Client: S3,
+    @Inject('S3') private s3CustomClient: S3CustomClient,
     @InjectRepository(Tweet) private tweetRepository: Repository<Tweet>,
   ) {}
 
@@ -25,7 +24,7 @@ export class TweetService {
           return t;
         }
         try {
-          t.imageURL = await this.getPresignedURL(t.imageKey);
+          t.imageURL = await this.s3CustomClient.getPresignedURL(t.imageKey);
           return t;
         } catch (e) {
           console.log(e);
@@ -75,10 +74,5 @@ export class TweetService {
 
   async delete(id: string) {
     return this.tweetRepository.delete(id);
-  }
-
-  private async getPresignedURL(key: string): Promise<string> {
-    const command = new GetObjectCommand({ Bucket: 'nest-sns', Key: key });
-    return getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
   }
 }
