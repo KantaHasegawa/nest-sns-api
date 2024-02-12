@@ -8,7 +8,6 @@ import { UserFixture } from '../helper/fixtures/user.fixture';
 import { Chance } from 'chance';
 import * as request from 'supertest';
 import { AuthBearerStrategy } from '../../src/auth/auth.bearer.strategy';
-import { Tweet } from '../../src/tweet/tweet';
 import { User } from '../../src/user/user';
 
 describe('Tweet', () => {
