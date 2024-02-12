@@ -47,10 +47,11 @@ export class TweetService {
     tweet.user = current;
 
     if (dto.image) {
-      const objectKey = `${Math.random().toString(36).slice(2)}.txt`;
+      const decodedFile = Buffer.from(dto.image, 'base64');
+      const objectKey = `${Math.random().toString(36).slice(2)}.jpeg`;
       tweet.imageKey = objectKey;
       try {
-        await this.uploadImage(objectKey, dto.image);
+        await this.uploadImage(objectKey, decodedFile);
       } catch (e) {
         throw new Error('Failed to upload image');
       }
@@ -71,12 +72,12 @@ export class TweetService {
     return this.tweetRepository.delete(id);
   }
 
-  private async uploadImage(key, image: string): Promise<void> {
+  private async uploadImage(key, image: Buffer): Promise<void> {
     const command = new PutObjectCommand({
       Bucket: 'nest-sns',
       Key: key,
       Body: image,
-      ContentType: 'text/plain',
+      ContentType: 'image/jpeg',
       ContentDisposition: 'inline',
     });
 
