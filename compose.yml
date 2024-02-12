@@ -18,6 +18,13 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
+  bull-redis:
+    image: redis:latest
+    ports:
+      - '6380:6380'
+    volumes:
+      - redis-data:/data
+    command: redis-server --port 6380 --appendonly yes
   minio:
     image: minio/minio
     ports:

@@ -9,6 +9,7 @@ import { Role } from './role/role';
 import { Tweet } from './tweet/tweet';
 import { TweetModule } from './tweet/tweet.module';
 import { AuthModule } from './auth/auth.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -27,6 +28,12 @@ import { AuthModule } from './auth/auth.module';
         entities: [User, Role, Tweet],
         logging: true,
       }),
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6380,
+      },
     }),
     UserModule,
     TweetModule,

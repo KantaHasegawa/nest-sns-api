@@ -4,12 +4,15 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FindManyOptions, Repository } from 'typeorm';
 import { TweetPostDto } from './tweet.post.dto';
 import { User } from '../user/user';
-import { GetObjectCommand, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { GetObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class TweetService {
   constructor(
+    @InjectQueue('tweet') private tweetQueue: Queue,
     @Inject('S3') private s3Client: S3,
     @InjectRepository(Tweet) private tweetRepository: Repository<Tweet>,
   ) {}
@@ -41,23 +44,25 @@ export class TweetService {
       .getMany();
   }
 
-  async create(current: User, dto: TweetPostDto): Promise<Tweet> {
+  async create(current: User, dto: TweetPostDto) {
     const tweet = new Tweet();
     tweet.content = dto.content;
     tweet.user = current;
 
     if (dto.image) {
-      const decodedFile = Buffer.from(dto.image, 'base64');
-      const objectKey = `${Math.random().toString(36).slice(2)}.jpeg`;
-      tweet.imageKey = objectKey;
       try {
-        await this.uploadImage(objectKey, decodedFile);
+        await this.tweetQueue.add(
+          {
+            user: current,
+            dto: dto,
+          },
+          { lifo: true },
+        );
       } catch (e) {
         throw new Error('Failed to upload image');
       }
     }
-
-    return this.tweetRepository.save(tweet);
+    return;
   }
 
   async like(current: User, id: string) {
@@ -70,18 +75,6 @@ export class TweetService {
 
   async delete(id: string) {
     return this.tweetRepository.delete(id);
-  }
-
-  private async uploadImage(key, image: Buffer): Promise<void> {
-    const command = new PutObjectCommand({
-      Bucket: 'nest-sns',
-      Key: key,
-      Body: image,
-      ContentType: 'image/jpeg',
-      ContentDisposition: 'inline',
-    });
-
-    await this.s3Client.send(command);
   }
 
   private async getPresignedURL(key: string): Promise<string> {
