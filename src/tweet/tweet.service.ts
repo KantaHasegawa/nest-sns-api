@@ -23,13 +23,8 @@ export class TweetService {
         if (!t.imageKey) {
           return t;
         }
-        try {
-          t.imageURL = await this.s3CustomClient.getPresignedURL(t.imageKey);
-          return t;
-        } catch (e) {
-          console.log(e);
-          return t;
-        }
+        t.imageURL = await this.s3CustomClient.getPresignedURL(t.imageKey);
+        return t;
       }),
     );
     return tweetsWithURL;
@@ -49,17 +44,13 @@ export class TweetService {
     tweet.user = current;
 
     if (dto.image) {
-      try {
-        await this.tweetQueue.add(
-          {
-            user: current,
-            dto: dto,
-          },
-          { lifo: true },
-        );
-      } catch (e) {
-        throw new Error('Failed to upload image');
-      }
+      await this.tweetQueue.add(
+        {
+          user: current,
+          dto: dto,
+        },
+        { lifo: true },
+      );
     }
     return;
   }

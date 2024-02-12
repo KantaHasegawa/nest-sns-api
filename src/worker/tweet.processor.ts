@@ -16,18 +16,14 @@ export class TweetConsumer {
 
   @Process()
   async tweet(job: { data: { user: User; dto: TweetPostDto } }) {
-    try {
-      const objectKey = `${Math.random().toString(36).slice(2)}.jpeg`;
-      await this.s3CustomClient.uploadImage(objectKey, job.data.dto.image);
-      const t = new Tweet();
-      t.user = job.data.user;
-      t.content = job.data.dto.content;
-      t.imageKey = objectKey;
-      await this.tweetRepository.save(t);
-      return;
-    } catch (e) {
-      console.log(e);
-    }
+    const objectKey = `${Math.random().toString(36).slice(2)}.jpeg`;
+    await this.s3CustomClient.uploadImage(objectKey, job.data.dto.image);
+    const t = new Tweet();
+    t.user = job.data.user;
+    t.content = job.data.dto.content;
+    t.imageKey = objectKey;
+    await this.tweetRepository.save(t);
+    return;
     return;
   }
 }
