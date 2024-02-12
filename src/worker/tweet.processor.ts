@@ -24,6 +24,5 @@ export class TweetConsumer {
     t.imageKey = objectKey;
     await this.tweetRepository.save(t);
     return;
-    return;
   }
 }
