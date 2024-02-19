@@ -11,7 +11,9 @@ import {
 import { TweetService } from './tweet.service';
 import { AuthBearerGuard } from '../auth/auth.bearer.guard';
 import { TweetPostDto } from './tweet.post.dto';
-import { UserIgnoreSensitive } from '../user/user';
+import { User } from '../user/user';
+import { AuthRolePremiumGuard } from '../auth/auth.role.premium.guard';
+
 @UseGuards(AuthBearerGuard)
 @Controller('tweets')
 export class TweetController {
@@ -22,10 +24,23 @@ export class TweetController {
     return this.tweetService.findAll();
   }
 
+  @UseGuards(AuthRolePremiumGuard)
+  @Get('likes')
+  async likes(@Request() req) {
+    const current = req.user as User;
+    return await this.tweetService.likes(current);
+  }
+
   @Post('')
   async create(@Request() req, @Body() dto: TweetPostDto) {
-    const current = req.user as UserIgnoreSensitive;
+    const current = req.user as User;
     return this.tweetService.create(current, dto);
+  }
+
+  @Post(':id/likes')
+  async like(@Request() req, @Param('id') id: string) {
+    const current = req.user as User;
+    return await this.tweetService.like(current, id);
   }
 
   @Delete(':id')

@@ -1,5 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { User, UserIgnoreSensitive } from '../user/user';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { User } from '../user/user';
 
 @Entity('tweets')
 export class Tweet {
@@ -9,6 +16,27 @@ export class Tweet {
   @Column()
   content: string;
 
-  @ManyToOne(() => User, (user) => user.tweets)
-  user: UserIgnoreSensitive;
+  @Column({
+    name: 'image_key',
+    nullable: true,
+  })
+  imageKey: string;
+
+  // NOTE: not column;
+  imageURL?: string;
+
+  @ManyToOne(() => User, (user) => user.tweets, {
+    createForeignKeyConstraints: false,
+  })
+  user: User;
+
+  @ManyToMany(() => User, (user) => user.likedTweets, {
+    createForeignKeyConstraints: false,
+  })
+  @JoinTable({
+    name: 'likes',
+    joinColumn: { name: 'tweet_id' },
+    inverseJoinColumn: { name: 'user_id' },
+  })
+  likedUsers: User[];
 }
