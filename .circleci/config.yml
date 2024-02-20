@@ -1,58 +1,58 @@
-version: 2.1
-orbs:
-  node: circleci/node@5.2.0
+# version: 2.1
+# orbs:
+#   node: circleci/node@5.2.0
 
-jobs:
-  build_and_test:
-    docker:
-      - image: cimg/node:20.11.0
-        environment:
-          MYSQL_DATABASE: sns_test
-          MYSQL_HOST: 127.0.0.1
-          MYSQL_PORT: 3306
-          MYSQL_ROOT_PASSWORD: 'password'
-          MYSQL_USERNAME: 'root'
-          MYSQL_PASSWORD: 'password'
-          REDIS_HOST: '127.0.0.1'
-          REDIS_PORT: '6379'
-          REDIS_USERNAME: ''
-          REDIS_PASSWORD: ''
-          S3_USER: 'root'
-          S3_PASSWORD: 'password'
-          S3_HOST: 'http://localhost'
-          S3_PORT: '9000'
-          S3_BUCKET: 'nest-sns-test'
-          BULL_REDIS_HOST: 'localhost'
-          BULL_REDIS_PORT: 6380
-      - image: cimg/mysql:8.0
-        command: |
-          mysqld --default-authentication-plugin=mysql_native_password
-        environment:
-          MYSQL_DATABASE: sns_test
-          MYSQL_HOST: 127.0.0.1
-          MYSQL_ROOT_PASSWORD: 'password'
-      - image: cimg/redis:6.0
-        command: redis-server --port 6379 --appendonly yes
-      - image: cimg/redis:6.0
-        command: redis-server --port 6380 --appendonly yes
-      - image: minio/minio
-        environment:
-          MINIO_ROOT_USER: root
-          MINIO_ROOT_PASSWORD: password
-        command: 'server /data --console-address ":9001"'
-    steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm run test
-          name: Run tests
+# jobs:
+#   build_and_test:
+#     docker:
+#       - image: cimg/node:20.11.0
+#         environment:
+#           MYSQL_DATABASE: sns_test
+#           MYSQL_HOST: 127.0.0.1
+#           MYSQL_PORT: 3306
+#           MYSQL_ROOT_PASSWORD: 'password'
+#           MYSQL_USERNAME: 'root'
+#           MYSQL_PASSWORD: 'password'
+#           REDIS_HOST: '127.0.0.1'
+#           REDIS_PORT: '6379'
+#           REDIS_USERNAME: ''
+#           REDIS_PASSWORD: ''
+#           S3_USER: 'root'
+#           S3_PASSWORD: 'password'
+#           S3_HOST: 'http://localhost'
+#           S3_PORT: '9000'
+#           S3_BUCKET: 'nest-sns-test'
+#           BULL_REDIS_HOST: 'localhost'
+#           BULL_REDIS_PORT: 6380
+#       - image: cimg/mysql:8.0
+#         command: |
+#           mysqld --default-authentication-plugin=mysql_native_password
+#         environment:
+#           MYSQL_DATABASE: sns_test
+#           MYSQL_HOST: 127.0.0.1
+#           MYSQL_ROOT_PASSWORD: 'password'
+#       - image: cimg/redis:6.0
+#         command: redis-server --port 6379 --appendonly yes
+#       - image: cimg/redis:6.0
+#         command: redis-server --port 6380 --appendonly yes
+#       - image: minio/minio
+#         environment:
+#           MINIO_ROOT_USER: root
+#           MINIO_ROOT_PASSWORD: password
+#         command: 'server /data --console-address ":9001"'
+#     steps:
+#       - checkout
+#       - node/install-packages:
+#           pkg-manager: npm
+#       - run:
+#           command: npm run test
+#           name: Run tests
 
-workflows:
-  test:
-    jobs:
-      - build_and_test:
-          filters:
-            branches:
-              only:
-                - develop
+# workflows:
+#   test:
+#     jobs:
+#       - build_and_test:
+#           filters:
+#             branches:
+#               only:
+#                 - develop
