@@ -31,6 +31,15 @@ jobs:
           MYSQL_DATABASE: sns_test
           MYSQL_HOST: 127.0.0.1
           MYSQL_ROOT_PASSWORD: 'password'
+      - image: cimg/redis:6.0
+        command: redis-server --port 6379 --appendonly yes
+      - image: cimg/redis:6.0
+        command: redis-server --port 6380 --appendonly yes
+      - image: minio/minio
+        environment:
+          MINIO_ROOT_USER: root
+          MINIO_ROOT_PASSWORD: password
+        command: 'server /data --console-address ":9001"'
     steps:
       - checkout
       - node/install-packages:
