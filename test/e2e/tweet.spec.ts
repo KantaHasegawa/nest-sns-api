@@ -1,5 +1,4 @@
 import { INestApplication } from '@nestjs/common';
-import { testDataSourceInstance } from '../helper/conn';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { DataSource } from 'typeorm';
@@ -9,41 +8,37 @@ import { Chance } from 'chance';
 import * as request from 'supertest';
 import { AuthBearerStrategy } from '../../src/auth/auth.bearer.strategy';
 import { User } from '../../src/user/user';
+import { patchRole } from '../../src/database/patch/role';
 
 describe('Tweet', () => {
   const chance = new Chance();
-  const testDataSource = testDataSourceInstance;
+  let dataSource: DataSource;
   let moduleRef: TestingModule;
   let app: INestApplication;
   let tweetFixture: TweetFixture;
   let userFixture: UserFixture;
   let current: User;
   let currentPremium: User;
-  const mockRedisClient = {};
 
   beforeAll(async () => {
-    await testDataSource.initializeTest();
-    tweetFixture = new TweetFixture(testDataSource);
-    userFixture = new UserFixture(testDataSource);
-    current = await userFixture.create();
-    currentPremium = await userFixture.createPremium();
     moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      .overrideProvider(DataSource)
-      .useValue(testDataSource)
-      .overrideProvider('REDIS')
-      .useValue(mockRedisClient)
-      .compile();
+    }).compile();
 
     app = moduleRef.createNestApplication();
+    dataSource = moduleRef.get<DataSource>(DataSource);
+    await patchRole(dataSource);
+    tweetFixture = new TweetFixture(dataSource);
+    userFixture = new UserFixture(dataSource);
+    current = await userFixture.create();
+    currentPremium = await userFixture.createPremium();
     const mockAuthBearerStrategy = moduleRef.get(AuthBearerStrategy);
     jest.spyOn(mockAuthBearerStrategy, 'validate').mockResolvedValue(current);
     await app.init();
   });
 
   afterAll(async () => {
-    await testDataSource.dropDatabase();
+    await dataSource.dropDatabase();
     await app.close();
   });
 

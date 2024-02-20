@@ -15,25 +15,34 @@ import { BullModule } from '@nestjs/bull';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath:
+        process.env.NODE_ENV === 'develop'
+          ? './env/develop.env'
+          : process.env.NODE_ENV === 'production'
+            ? './env/production.env'
+            : './env/test.env',
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'mysql',
         host: config.get<string>('MYSQL_HOST'),
-        port: 3306,
+        port: config.get<number>('MYSQL_PORT'),
         username: config.get<string>('MYSQL_USERNAME'),
         password: config.get<string>('MYSQL_PASSWORD'),
-        database: 'sns',
+        database: config.get<string>('MYSQL_DATABASE'),
         entities: [User, Role, Tweet],
-        logging: true,
+        synchronize: process.env.NODE_ENV === 'test' ? true : false,
       }),
     }),
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6380,
-      },
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        redis: {
+          host: config.get<string>('BULL_REDIS_HOST'),
+          port: config.get<number>('BULL_REDIS_PORT'),
+        },
+      }),
     }),
     UserModule,
     TweetModule,
