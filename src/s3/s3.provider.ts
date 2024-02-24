@@ -45,15 +45,22 @@ export const S3Provider = {
   provide: 'S3',
   inject: [ConfigService],
   useFactory: (config: ConfigService) => {
-    const s3 = new S3({
-      region: 'ap-northeast-1',
-      endpoint: `${config.get<string>('S3_HOST')}:${config.get<string>('S3_PORT')}`,
-      forcePathStyle: true,
-      credentials: {
-        accessKeyId: config.get<string>('S3_USER'),
-        secretAccessKey: config.get<string>('S3_PASSWORD'),
-      },
-    });
+    let s3: S3;
+    if (process.env.NODE_ENV === 'production') {
+      s3 = new S3({
+        region: 'ap-northeast-1',
+      });
+    } else {
+      s3 = new S3({
+        region: 'ap-northeast-1',
+        endpoint: `${config.get<string>('S3_HOST')}:${config.get<string>('S3_PORT')}`,
+        forcePathStyle: true,
+        credentials: {
+          accessKeyId: config.get<string>('S3_USER'),
+          secretAccessKey: config.get<string>('S3_PASSWORD'),
+        },
+      });
+    }
     return new S3CustomClient(s3, config.get<string>('S3_BUCKET'));
   },
 };
