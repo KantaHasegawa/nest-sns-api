@@ -18,9 +18,7 @@ import { BullModule } from '@nestjs/bull';
       envFilePath:
         process.env.NODE_ENV === 'develop'
           ? './env/develop.env'
-          : process.env.NODE_ENV === 'production'
-            ? './env/production.env'
-            : './env/test.env',
+          : './env/test.env',
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
