@@ -20,7 +20,7 @@ import { BullModule } from '@nestjs/bull';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'mysql',
-        host: config.get<string>('MYSQL_HOST'),
+        host: config.get<string>('RDS_HOSTNAME'),
         port: 3306,
         username: config.get<string>('MYSQL_USERNAME'),
         password: config.get<string>('MYSQL_PASSWORD'),
