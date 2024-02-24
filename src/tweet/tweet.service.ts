@@ -4,14 +4,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FindManyOptions, Repository } from 'typeorm';
 import { TweetPostDto } from './tweet.post.dto';
 import { User } from '../user/user';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
+// import { InjectQueue } from '@nestjs/bull';
+// import { Queue } from 'bull';
 import { S3CustomClient } from '../s3/s3.provider';
 
 @Injectable()
 export class TweetService {
   constructor(
-    @InjectQueue('tweet') private tweetQueue: Queue,
+    // @InjectQueue('tweet') private tweetQueue: Queue,
     @Inject('S3') private s3CustomClient: S3CustomClient,
     @InjectRepository(Tweet) private tweetRepository: Repository<Tweet>,
   ) {}
@@ -43,15 +43,15 @@ export class TweetService {
     tweet.content = dto.content;
     tweet.user = current;
 
-    if (dto.image) {
-      await this.tweetQueue.add(
-        {
-          user: current,
-          dto: dto,
-        },
-        { lifo: true },
-      );
-    }
+    // if (dto.image) {
+    //   await this.tweetQueue.add(
+    //     {
+    //       user: current,
+    //       dto: dto,
+    //     },
+    //     { lifo: true },
+    //   );
+    // }
     return;
   }
 

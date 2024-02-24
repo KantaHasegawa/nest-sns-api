@@ -9,7 +9,7 @@ import { Role } from './role/role';
 import { Tweet } from './tweet/tweet';
 import { TweetModule } from './tweet/tweet.module';
 import { AuthModule } from './auth/auth.module';
-import { BullModule } from '@nestjs/bull';
+// import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -33,15 +33,15 @@ import { BullModule } from '@nestjs/bull';
         synchronize: process.env.NODE_ENV === 'test' ? true : false,
       }),
     }),
-    BullModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        redis: {
-          host: config.get<string>('BULL_REDIS_HOST'),
-          port: config.get<number>('BULL_REDIS_PORT'),
-        },
-      }),
-    }),
+    // BullModule.forRootAsync({
+    //   inject: [ConfigService],
+    //   useFactory: (config: ConfigService) => ({
+    //     redis: {
+    //       host: config.get<string>('BULL_REDIS_HOST'),
+    //       port: config.get<number>('BULL_REDIS_PORT'),
+    //     },
+    //   }),
+    // }),
     UserModule,
     TweetModule,
     AuthModule,
