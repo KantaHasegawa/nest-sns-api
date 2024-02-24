@@ -5,37 +5,26 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../../src/app.module';
-import { testDataSourceInstance } from '../helper/conn';
 import * as bcrypt from 'bcrypt';
 import { AuthBearerStrategy } from '../../src/auth/auth.bearer.strategy';
 import { User } from '../../src/user/user';
 
 describe('Users', () => {
-  const testDataSource = testDataSourceInstance;
   let app: INestApplication;
+  let dataSource: DataSource;
   let userFixture: UserFixture;
   let userRepository: UserRepository;
-  const mockRedisClient = {
-    hSet: jest.fn(),
-  };
   let current: User;
 
   beforeAll(async () => {
-    await testDataSource.initializeTest();
-    userFixture = new UserFixture(testDataSource);
-    current = await userFixture.create();
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      .overrideProvider(DataSource)
-      .useValue(testDataSource)
-      .overrideProvider('REDIS')
-      .useValue(mockRedisClient)
-      .compile();
+    }).compile();
 
-    const dataSource = moduleRef.get<DataSource>(DataSource);
+    dataSource = moduleRef.get<DataSource>(DataSource);
     userFixture = new UserFixture(dataSource);
     userRepository = moduleRef.get<UserRepository>(UserRepository);
+    current = await userFixture.create();
 
     app = moduleRef.createNestApplication();
     const mockAuthBearerStrategy = moduleRef.get(AuthBearerStrategy);
@@ -44,7 +33,7 @@ describe('Users', () => {
   });
 
   afterAll(async () => {
-    await testDataSource.dropDatabase();
+    await dataSource.dropDatabase();
     await app.close();
   });
 

@@ -6,7 +6,7 @@ export const RedisProvider = {
   inject: [ConfigService],
   useFactory: async (config: ConfigService) => {
     const client = createClient({
-      url: `redis://${config.get<string>('REDIS_USERNAME')}:${config.get<string>('REDIS_PASSWORD')}@${config.get<string>('REDIS_HOST')}:6379`,
+      url: `redis://${config.get<string>('REDIS_USERNAME')}:${config.get<string>('REDIS_PASSWORD')}@${config.get<string>('REDIS_HOST')}:${config.get<string>('REDIS_PORT')}`,
     });
     client.on('error', (err) => console.log('Redis Client Error', err));
     await client.connect();
