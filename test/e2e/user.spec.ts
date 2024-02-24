@@ -5,7 +5,7 @@ import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../../src/app.module';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { AuthBearerStrategy } from '../../src/auth/auth.bearer.strategy';
 import { User } from '../../src/user/user';
 

@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { Chance } from 'chance';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../../../src/user/user';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Role } from '../../../src/role/role';
 
 export class UserFixture {
